@@ -25,7 +25,7 @@ router.post("/create-draft-order", upload.array('images[]', 5), async (req, res)
             { name: "Reference Image", value: uploadedImages.join(", ") || "" }
         ]
     };
-
+    // FOR CUSTOMER DETAIL
     const customerDetails = `
                     Customer: ${name}
                     Email: ${email}
@@ -68,28 +68,28 @@ router.post("/create-draft-order", upload.array('images[]', 5), async (req, res)
         }
     );
 
-    // const draftOrderId = response.data.draft_order.id;
+    const draftOrderId = response.data.draft_order.id;
 
-    // FOR SENDING INVOICE (Currently disabled to avoid network errors)
-    // const invoiceResponse = await axios.post(`https://${SHOP}/admin/api/2024-07/draft_orders/${draftOrderId}/send_invoice.json`,
-    //     {
-    //         draft_order_invoice: {
-    //             to: email,
-    //             subject: "Your Custom Order Invoice",
-    //             custom_message: `Hi ${name},\n\nThank you for your custom order!!`
-    //         }
-    //     },
-    //     {
-    //         headers: {
-    //             "X-Shopify-Access-Token": ACCESS_TOKEN,
-    //             "Content-Type": "application/json"
-    //         }
-    //     }
-    // );
+    const invoiceResponse = await axios.post(`https://${SHOP}/admin/api/2024-07/draft_orders/${draftOrderId}/send_invoice.json`,
+        {
+            draft_order_invoice: {
+                to: email,
+                subject: "Your Custom Order Invoice",
+                custom_message: `Hi ${name},\n\nThank you for your custom order!!`
+            }
+        },
+        {
+            headers: {
+                "X-Shopify-Access-Token": ACCESS_TOKEN,
+                "Content-Type": "application/json"
+            }
+        }
+    );
 
     res.status(201).json({
         success: true,
-        draftOrder: response.data.draft_order
+        draftOrder: response.data.draft_order,
+        invoice: invoiceResponse.data.draft_order_invoice
     });
 });
 
